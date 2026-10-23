@@ -1,0 +1,4 @@
+* text=auto eol=lf
+*.bat text eol=crlf
+# checksum-verified data file: keep bytes exactly as shipped
+fragment_api/ton/bip39_english.txt -text

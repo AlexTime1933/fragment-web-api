@@ -1,0 +1,29 @@
+# ---- secrets: never commit ----
+.env
+.env.*
+cookie.json
+cookies.json
+*.cookies.json
+seed*.txt
+mnemonic*.txt
+*.seed
+tonapi_key*
+secrets/
+
+# ---- python ----
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+build/
+dist/
+*.egg-info/
+.pytest_cache/
+.coverage
+htmlcov/
+
+# ---- editors / os ----
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db

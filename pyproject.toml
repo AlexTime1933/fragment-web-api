@@ -1,0 +1,28 @@
+[build-system]
+requires = ["setuptools>=69"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "fragment-web-to-api"
+version = "0.1.0"
+description = "Buy Telegram Stars and Premium on fragment.com, paid from your own TON wallet (W5/V4R2)"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "Unlicense" }
+dependencies = [
+    # exact, hash-verified versions are in requirements.lock
+    "httpx>=0.28.1,<0.29",
+    "cryptography>=44",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8"]
+
+[tool.setuptools.packages.find]
+include = ["fragment_api*"]
+
+[tool.setuptools.package-data]
+"fragment_api.ton" = ["bip39_english.txt"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
