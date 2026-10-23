@@ -5,7 +5,7 @@ from pathlib import Path
 import pytest
 
 ROOT = Path(__file__).resolve().parent.parent
-# run the tests against this checkout, even if another fragment_api is installed
+# run the tests against this checkout, even if another fragment_web_api is installed
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 

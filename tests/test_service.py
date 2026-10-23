@@ -5,17 +5,17 @@ from decimal import Decimal
 
 import pytest
 
-from fragment_api import Fragment, SafetyPolicy
-from fragment_api.exceptions import (
+from fragment_web_api import Fragment, SafetyPolicy
+from fragment_web_api.exceptions import (
     InsufficientBalanceError,
     TransactionFailedError,
     TransactionSafetyError,
 )
-from fragment_api.fragment import FragmentClient
-from fragment_api.ton import Address, WalletV5R1, mnemonic, read_comment
-from fragment_api.ton.keys import verify
-from fragment_api.ton.cell import Cell
-from fragment_api.ton.tonapi import TonApiClient
+from fragment_web_api.fragment import FragmentClient
+from fragment_web_api.ton import Address, WalletV5R1, mnemonic, read_comment
+from fragment_web_api.ton.keys import verify
+from fragment_web_api.ton.cell import Cell
+from fragment_web_api.ton.tonapi import TonApiClient
 
 from .fakes import FRAGMENT_ADDR, FakeFragment, FakeTonApi, decode_external, mock_client, parse_v5_body
 
@@ -215,7 +215,7 @@ def _usdt_rejected(wallet, match, safety=None, **frag_attrs):
 
 
 def test_usdt_payment(wallet):
-    from fragment_api.ton.jetton import parse_transfer
+    from fragment_web_api.ton.jetton import parse_transfer
 
     from .fakes import JETTON_WALLET
 
@@ -280,7 +280,7 @@ def test_usdt_insufficient_balance(wallet):
 
 
 def test_unknown_payment_method(wallet):
-    from fragment_api.exceptions import ConfigError
+    from fragment_web_api.exceptions import ConfigError
 
     f, frag, ton = build(wallet)
     with pytest.raises(ConfigError):

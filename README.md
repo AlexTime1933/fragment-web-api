@@ -1,6 +1,6 @@
-# fragment-web-to-api
+# fragment-web-api
 
-**[English](#english)** · **[Русский](#русский)**
+**[English](#english)** · **[Русский](#русский)** · **[Donate](#donate)** 
 
 ---
 
@@ -8,46 +8,46 @@
 
 ## English
 
-A Python library that buys **Telegram Stars** and **Telegram Premium** on [fragment.com](https://fragment.com)
-for any Telegram user and pays for them from **your own TON wallet**: TON, or USDT on the TON network.
-Fragment has no public API. This library talks to the same web interface the site uses and signs the
-payment locally. Use it to build Telegram bots, websites and shops.
+A Python library for buying **Telegram Stars** and **Telegram Premium** on [fragment.com](https://fragment.com)
+for any Telegram user, paid from **your own TON wallet**: in TON or in USDT (TON network).
+Fragment has no public API. The library works with the same web interface the site uses and signs the
+payment locally.
 
-> **Unofficial project.** It is not affiliated with Telegram or Fragment. Fragment may change its
-> website at any time, and this library may then need an update. **The library moves real money from
-> your wallet.** Read the safety section, start with small amounts and use `dry_run=True` first.
+> **Unofficial project.** Not affiliated with Telegram or Fragment. Fragment may change its website at
+> any time, and the library will then need an update. **The library spends real money from your wallet.**
+> Read the safety section, start with small amounts and use `dry_run=True` first.
 
 ### Features
 
-- Prices for Stars and Premium, recipient lookup, purchases for any `@username` or for yourself.
+- Stars and Premium prices, recipient lookup, purchases for any `@username` or for yourself.
 - Payment in **TON** or **USDT (TON network)** from the same wallet.
 - Local signing: TON cells, BoC, addresses and **W5 (V5R1) / V4R2** wallets are written from scratch.
-  They are verified bit-for-bit against a reference implementation and against real wallets on-chain
+  They are verified bit for bit against a reference implementation and real wallets on-chain
   (see [LIBRARIES.md](LIBRARIES.md), in Russian).
-- **Safety checks before signing**: allowed destinations, amount against the quoted price, hard caps,
-  balance, network, sender. A suspicious transaction is refused and **nothing is signed**.
-- **Pure API, stores nothing.** Your application passes cookies, seed and API key as values. The
-  library does not read `.env`, files or environment variables and does not write to disk.
+- **Safety checks before signing**: allowed addresses, amount against the price, hard limits, balance,
+  network, sender. A suspicious transaction is rejected and **nothing is signed**.
+- **Pure API, stores nothing.** Your application passes cookies, seed and API key as values.
+  The library does not read `.env`, files or environment variables and writes nothing to disk.
 - Only two direct dependencies: `httpx` (Encode) and `cryptography` (PyCA). All versions are pinned
   with SHA-256 hashes in `requirements.lock`.
 - Async API (`Fragment`) and a blocking wrapper (`FragmentSync`).
-- Seed phrase: 24-word TON or 12/24-word BIP39, detected automatically.
+- Seed: 24 words in TON format or 12/24 words in BIP39 format, detected automatically.
 
 ### What you need
 
 1. **Python 3.10+**.
 2. **A TON wallet** (for example Tonkeeper, W5) and its **seed phrase**.
 3. **Fragment cookies.** Log in to fragment.com with Telegram and connect the same wallet. Then open
-   DevTools (F12) → Application → Cookies → `https://fragment.com` and copy `stel_ssid`, `stel_token`,
-   `stel_ton_token` and `stel_dt`.
-   - Before the first purchase Fragment asks you to **link the wallet to your Telegram account**.
-     This is permanent, so do it yourself in the browser. The library detects the request
+   the developer tools (F12) → Application → Cookies → `https://fragment.com` and copy
+   `stel_ssid`, `stel_token`, `stel_ton_token` and `stel_dt`.
+   - Before the first purchase Fragment asks you to **link the wallet to your Telegram account**. This
+     cannot be undone, so do it yourself in the browser. The library recognizes this request
      (`WalletLinkRequiredError`) and never does it on its own.
-   - Fragment may also ask for KYC (`VerificationRequiredError`). It can only be passed in the browser.
-4. **A tonapi.io API key** from [tonconsole.com](https://tonconsole.com). It is used to read the
-   balance and to send and track transactions.
-5. Funds on the wallet: TON or USDT for the purchase, plus a little TON for network fees
-   (about 0.05 TON per USDT payment; the unused part comes back).
+   - Fragment may require KYC (`VerificationRequiredError`). It can only be passed in the browser.
+4. **A tonapi.io API key** from [tonconsole.com](https://tonconsole.com). It is used to read the balance,
+   send transactions and track them.
+5. Funds on the wallet: TON or USDT for the purchase and a little TON for network fees
+   (about 0.05 TON per USDT payment, the unused part comes back).
 
 ### Installation
 
@@ -62,13 +62,14 @@ python -m venv .venv
 .venv/bin/python -m pip install --no-deps .
 ```
 
-The pip package is called `fragment-web-to-api`; in code you import `fragment_api`.
+The pip package and the repository are called `fragment-web-api`; in code the module is
+`fragment_web_api` (Python module names cannot contain hyphens, hence the underscores).
 
 ### Quick start
 
 ```python
 import asyncio
-from fragment_api import Fragment
+from fragment_web_api import Fragment
 
 async def main():
     async with Fragment.create(
@@ -96,10 +97,10 @@ async def main():
 asyncio.run(main())
 ```
 
-Blocking code (scripts, Django, …) takes the same arguments:
+Blocking code (scripts, Django, etc.) takes the same arguments:
 
 ```python
-from fragment_api import FragmentSync
+from fragment_web_api import FragmentSync
 
 with FragmentSync.create(cookies, mnemonic=seed, tonapi_key=key) as f:
     print(f.get_stars_price(100))
@@ -116,24 +117,24 @@ Low-level access: `f.client` (`FragmentClient`), `f.wallet` (`WalletV5R1`), `f.t
 4. `getBuyStarsLink` / `getGiftPremiumLink`: Fragment returns a TON Connect transaction.
 5. **Local safety checks** (`SafetyPolicy`), see below.
 6. Signing with the seed key, sending through tonapi.
-7. Waiting for the wallet transaction on-chain (by normalized message hash, TEP-467).
-8. `confirm_method`: the signed BoC is reported back to Fragment, as the website does.
+7. Waiting for the wallet transaction on-chain (by the normalized message hash, TEP-467).
+8. `confirm_method`: the signed BoC is reported to Fragment, as the website does.
 
 Purchases from one wallet are executed one after another automatically (seqno).
 
 ### Safety checks (`SafetyPolicy`)
 
-Before anything is signed:
+Before signing:
 
 - **TON payment:** the destination must be one of Fragment's known payment wallets
-  (`FRAGMENT_PAYMENT_ADDRESSES`); the amount must not exceed the quoted price (+2 % / 0.05 TON) or
+  (`FRAGMENT_PAYMENT_ADDRESSES`); the amount must not exceed the price (+2 % / 0.05 TON) or
   `max_amount_ton` (100); at most 4 messages, no `stateInit`; correct network; not expired; Fragment
-  must expect the payment from your wallet; the balance must cover the amount and fees.
-- **USDT payment** (`payment_method="usdt_ton"`, a TEP-74 jetton transfer): exactly one message, sent
-  to **your own** USDT jetton wallet (its address is derived on-chain from the USDT master contract,
-  not taken from Fragment); USDT goes to an allowed Fragment address; the unused gas returns to your
-  wallet; no custom payload; at most `max_jetton_gas_ton` (0.1 TON) for gas; the USDT amount must not
-  exceed Fragment's USD price (+2 % / 0.05) or `max_amount_usdt` (100); enough USDT and TON on the wallet.
+  expects the payment from your wallet; the balance covers the amount and fees.
+- **USDT payment** (`payment_method="usdt_ton"`, a TEP-74 jetton transfer): exactly one message to
+  **your own** USDT wallet (its address is derived on-chain from the USDT contract, not taken from
+  Fragment); USDT goes to an allowed Fragment address; the unused gas returns to your wallet; no custom
+  payload; at most `max_jetton_gas_ton` (0.1 TON) for gas; the USDT amount does not exceed Fragment's
+  USD price (+2 % / 0.05) or `max_amount_usdt` (100); enough USDT and TON.
 
 All limits are fields of `SafetyPolicy` and can be passed to `Fragment.create(safety=...)`.
 
@@ -145,29 +146,19 @@ All limits are fields of `SafetyPolicy` and can be passed to `Fragment.create(sa
 | `WalletNotConnectedError` | no wallet linked to the session (`link_wallet()`) |
 | `WalletLinkRequiredError` | Fragment asks to link the wallet to the Telegram account (do it in the browser) |
 | `VerificationRequiredError` | Fragment requires KYC |
-| `RecipientNotFoundError` | no such user / already has Premium / a bot |
+| `RecipientNotFoundError` | no such user / already has Premium / it is a bot |
 | `InvalidAmountError` | Stars outside 50…10 000 000, months not 3/6/12 |
-| `TransactionSafetyError` | Fragment's transaction failed a safety check, **nothing was signed** |
+| `TransactionSafetyError` | Fragment's transaction failed a check, **nothing was signed** |
 | `InsufficientBalanceError` | not enough TON or USDT |
 | `TransactionFailedError` | the wallet transaction failed on-chain |
-| `TransactionTimeoutError` | sent, but not confirmed yet. **Do not retry blindly**; check `check_payment(e.message_hash)` first |
+| `TransactionTimeoutError` | sent, but not confirmed yet. **Do not retry blindly**, check `check_payment(e.message_hash)` first |
 
 All of them inherit from `FragmentAPIError`.
-
-### Tests
-
-```bash
-.venv/bin/python -m pip install pytest==9.1.1
-.venv/bin/python -m pytest tests
-```
-
-The tests run offline against fake fragment.com and tonapi. They check cells, addresses, keys and
-signed transfers against reference vectors, the full purchase flow and every safety check.
 
 ### Project layout
 
 ```
-fragment_api/
+fragment_web_api/
   service.py        Fragment: high-level API, SafetyPolicy
   sync.py           FragmentSync
   exceptions.py
@@ -176,22 +167,21 @@ fragment_api/
                     wallets.py (W5/V4R2), tonconnect.py, tonapi.py, jetton.py (USDT, TEP-74)
 tests/              offline tests and fixtures
 requirements.lock   exact dependency versions with SHA-256 hashes
-LIBRARIES.md        dependencies, sources and verification notes (Russian)
+LIBRARIES.md        dependencies, sources and how everything was verified (in Russian)
 ```
 
 ### Example application
 
-**telegram-shop-on-fragment-web-api** (a separate repository) is a ready-made Telegram shop
-bot built on this library. It has orders, payment providers and an admin panel.
+**telegram-shop-on-fragment-web-api** (a separate repository) is a ready-made Telegram shop bot
+built on this library: orders, payment providers, admin panel.
 
 ### License
 
 [The Unlicense](LICENSE): the code is released into the **public domain**. Anyone may copy, modify,
-use, sell and distribute it for any purpose, without any conditions, not even attribution.
+use, sell and distribute it for any purpose without any conditions, not even attribution.
 
-The code was written with the help of an AI model (Claude, Anthropic) under human direction.
-It comes **as is, without any warranty**. You are responsible for checking it before you trust it
-with real money.
+The code was written with the help of an AI model (Claude, Anthropic) under human direction. It is
+provided **as is, without any warranty**. Check it yourself before you trust it with real money.
 
 ---
 
@@ -202,7 +192,7 @@ with real money.
 Python-библиотека для покупки **Telegram Stars** и **Telegram Premium** на [fragment.com](https://fragment.com)
 любому пользователю Telegram с оплатой со **своего TON-кошелька**: в TON или в USDT (сеть TON).
 У Fragment нет публичного API. Библиотека работает с тем же веб-интерфейсом, что и сайт, и подписывает
-платёж локально. Подходит для Telegram-ботов, сайтов и магазинов.
+платёж локально.
 
 > **Неофициальный проект.** Не связан с Telegram и Fragment. Fragment может в любой момент изменить
 > сайт, и тогда библиотеку придётся обновить. **Библиотека тратит настоящие деньги с вашего кошелька.**
@@ -253,13 +243,14 @@ python -m venv .venv
 .venv/bin/python -m pip install --no-deps .
 ```
 
-Пакет pip называется `fragment-web-to-api`, в коде импортируется `fragment_api`.
+Пакет pip и репозиторий называются `fragment-web-api`, в коде модуль — `fragment_web_api`
+(в именах модулей Python дефис недопустим, поэтому подчёркивания).
 
 ### Быстрый старт
 
 ```python
 import asyncio
-from fragment_api import Fragment
+from fragment_web_api import Fragment
 
 async def main():
     async with Fragment.create(
@@ -290,7 +281,7 @@ asyncio.run(main())
 Синхронно (скрипты, Django и т. п.), аргументы те же:
 
 ```python
-from fragment_api import FragmentSync
+from fragment_web_api import FragmentSync
 
 with FragmentSync.create(cookies, mnemonic=seed, tonapi_key=key) as f:
     print(f.get_stars_price(100))
@@ -345,20 +336,10 @@ with FragmentSync.create(cookies, mnemonic=seed, tonapi_key=key) as f:
 
 Все наследуются от `FragmentAPIError`.
 
-### Тесты
-
-```bash
-.venv/bin/python -m pip install pytest==9.1.1
-.venv/bin/python -m pytest tests
-```
-
-Тесты работают офлайн, на поддельных fragment.com и tonapi. Они сверяют ячейки, адреса, ключи и
-подписанные переводы с эталонными векторами, проверяют весь цикл покупки и каждую проверку безопасности.
-
 ### Структура
 
 ```
-fragment_api/
+fragment_web_api/
   service.py        Fragment: высокоуровневый API, SafetyPolicy
   sync.py           FragmentSync
   exceptions.py
@@ -383,3 +364,12 @@ LIBRARIES.md        зависимости, источники и как всё 
 
 Код написан с помощью нейросети (Claude, Anthropic) под руководством человека. Он предоставляется
 **как есть, без каких-либо гарантий**. Перед тем как доверять ему настоящие деньги, проверьте его сами.
+
+---
+
+<a id="donate"></a>
+
+## Donate
+
+USDT-TON
+UQAofMXUIsd3tYANrkQ5qTHc0BdMSwNw8ZkocQgZhWVFt3BI

@@ -2,10 +2,10 @@ import base64
 
 import pytest
 
-from fragment_api.ton import Address, AddressError, Builder, Cell, CellError, comment_body, read_comment
-from fragment_api.ton.boc import deserialize_boc, serialize_boc
-from fragment_api.ton.crc import crc16, crc32c
-from fragment_api.ton.wallets import V4R2_CODE, V5R1_CODE
+from fragment_web_api.ton import Address, AddressError, Builder, Cell, CellError, comment_body, read_comment
+from fragment_web_api.ton.boc import deserialize_boc, serialize_boc
+from fragment_web_api.ton.crc import crc16, crc32c
+from fragment_web_api.ton.wallets import V4R2_CODE, V5R1_CODE
 
 
 def test_crc_known_values():

@@ -5,10 +5,10 @@ import time
 
 import pytest
 
-from fragment_api.ton import Address, Cell, InternalMessage, WalletV4R2, WalletV5R1, mnemonic
-from fragment_api.ton.keys import verify
-from fragment_api.ton.messages import normalized_external_hash
-from fragment_api.ton.tonconnect import account_info, ton_proof, ton_proof_message
+from fragment_web_api.ton import Address, Cell, InternalMessage, WalletV4R2, WalletV5R1, mnemonic
+from fragment_web_api.ton.keys import verify
+from fragment_web_api.ton.messages import normalized_external_hash
+from fragment_web_api.ton.tonconnect import account_info, ton_proof, ton_proof_message
 
 DEST = "EQBAjaOyi2wGWlk-EDkSabqqnF-MrrwMadnwqrurKpkla9nE"
 EXT_HEADER_BITS = 2 + 2 + 267 + 4  # ext_in_msg_info, src none, dest, import_fee

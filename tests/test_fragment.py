@@ -4,7 +4,7 @@ from decimal import Decimal
 
 import pytest
 
-from fragment_api.exceptions import (
+from fragment_web_api.exceptions import (
     AuthenticationError,
     ConfigError,
     InvalidAmountError,
@@ -12,8 +12,8 @@ from fragment_api.exceptions import (
     VerificationRequiredError,
     WalletNotConnectedError,
 )
-from fragment_api.fragment import FragmentClient, normalize_username, parse_cookies, parser
-from fragment_api.fragment.models import TonConnectTransaction
+from fragment_web_api.fragment import FragmentClient, normalize_username, parse_cookies, parser
+from fragment_web_api.fragment.models import TonConnectTransaction
 
 from .conftest import load_fixture
 from .fakes import FakeFragment, mock_client
@@ -86,7 +86,7 @@ def test_library_does_not_read_cookie_files(tmp_path):
 
 
 def test_network_errors_are_retried_then_wrapped():
-    from fragment_api.exceptions import FragmentError
+    from fragment_web_api.exceptions import FragmentError
     import httpx
 
     attempts = []
@@ -201,7 +201,7 @@ def test_transaction_valid_until_ms_normalized():
 
 
 def test_wallet_link_popup_is_not_kyc():
-    from fragment_api import WalletLinkRequiredError
+    from fragment_web_api import WalletLinkRequiredError
 
     fake = FakeFragment()
     fake.extra_response["getBuyStarsLink"] = dict(FakeFragment.LINK_POPUP)

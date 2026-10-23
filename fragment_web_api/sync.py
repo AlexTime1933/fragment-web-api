@@ -1,4 +1,4 @@
-"""Blocking wrapper around :class:`fragment_api.Fragment` for scripts and sync frameworks.
+"""Blocking wrapper around :class:`fragment_web_api.Fragment` for scripts and sync frameworks.
 
 Do not use inside a running event loop (e.g. aiogram handlers) — use the
 async :class:`Fragment` there.

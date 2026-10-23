@@ -1,4 +1,4 @@
-"""fragment_api — buy Telegram Stars and Premium on fragment.com, paid from your own TON wallet."""
+"""fragment_web_api — buy Telegram Stars and Premium on fragment.com, paid from your own TON wallet."""
 
 from .exceptions import (
     AuthenticationError,
